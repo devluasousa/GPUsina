@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Ponto</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+        }
+        select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        select#nome {  
+            margin-bottom: 20px; 
+        }
+        p {
+            margin-top: 10px;
+        }
+        .select2-container--default .select2-selection--single {
+            border: 1px solid #aaa;
+            border-radius: 5px;
+            height: 28px;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 28px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Registro de Ponto</h1>
+        <form action="" method="post">
+            <label for="nome">Nome:</label>
+            <select name="nome" id="nome">
+                <option></option> <!-- Opção inicial padrão -->
+                {% for nome in nomes %}
+                <option value="{{ nome }}">{{ nome }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="action">Tipo de Batida:</label>
+            <select name="action" id="action">
+                <option></option> <!-- Opção inicial padrão -->
+                <option value="Entrada">Entrada</option>
+                <option value="Saída para almoço">Saída para Almoço</option>
+                <option value="Entrada do almoço">Entrada do Almoço</option>
+                <option value="Saída">Saída</option>
+            </select>
+
+            <button type="submit">Registrar</button>
+        </form>
+        <p>Data/Hora: <span id="realtime"></span></p>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#nome').select2({
+                placeholder: "Selecionar nome",
+                allowClear: true
+            });
+            $('#action').select2({
+                placeholder: "Selecionar tipo de batida",
+                allowClear: true
+            });
+        });
+        function updateTime() {
+        var now = new Date();
+        // Usar toLocaleString em vez de toLocaleTimeString para incluir a data
+        var display = now.toLocaleString('pt-BR', { hour12: false });
+        document.getElementById('realtime').textContent = display;
+        }
+        setInterval(updateTime, 1000);  // Atualiza a hora e a data a cada segundo
+        updateTime();  // Ativa a função imediatamente ao carregar a página    
+    </script>
+</body>
+</html>
