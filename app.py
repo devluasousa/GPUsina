@@ -5,28 +5,28 @@ from google.oauth2.service_account import Credentials
 import os
 
 # Definir a variável de ambiente ALLOWED_IPS diretamente para testes locais
-os.environ['ALLOWED_IPS'] = '192.168.2.137,127.0.0.1,152.249.143.223'
+#os.environ['ALLOWED_IPS'] = '192.168.2.137,127.0.0.1,152.249.143.223'
 
 app = Flask(__name__)
 
 # Obtendo os IPs permitidos da variável de ambiente
-ALLOWED_IPS = os.getenv('ALLOWED_IPS', '').split(',')
+#ALLOWED_IPS = os.getenv('ALLOWED_IPS', '').split(',')
 
-@app.before_request
-def limit_remote_addr():
+#@app.before_request
+#def limit_remote_addr():
     # Render pode usar 'X-Forwarded-For' para o IP real do cliente
-    if 'X-Forwarded-For' in request.headers:
+    #if 'X-Forwarded-For' in request.headers:
         user_ip = request.headers['X-Forwarded-For'].split(',')[0]
-    else:
-        user_ip = request.remote_addr
+    #else:
+     #   user_ip = request.remote_addr
 
-    print(f"Cliente IP: {user_ip}")  # Adicionado para depuração
-    print(f"Allowed IPs: {ALLOWED_IPS}")  # Adicionado para depuração
+    #print(f"Cliente IP: {user_ip}")  # Adicionado para depuração
+    #print(f"Allowed IPs: {ALLOWED_IPS}")  # Adicionado para depuração
 
     # Verifique se o IP está na lista de IPs permitidos
-    if user_ip not in ALLOWED_IPS:
-        print(f"Acesso negado para IP: {user_ip}")  # Adicionado para depuração
-        abort(403)  # Se o IP não estiver na lista, proíbe o acesso
+    #if user_ip not in ALLOWED_IPS:
+        #print(f"Acesso negado para IP: {user_ip}")  # Adicionado para depuração
+        #abort(403)  # Se o IP não estiver na lista, proíbe o acesso
 
 # Configure o Google Sheets
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
