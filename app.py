@@ -8,7 +8,7 @@ app = Flask(__name__)
 # Lista de IPs permitidos
 ALLOWED_IPS = ['152.249.143.223','192.168.2.137', '127.0.0.1']
 
- @app.before_request
+@app.before_request
 def limit_remote_addr():
     # Heroku armazena o endereço IP real do cliente no cabeçalho 'X-Forwarded-For'
     if 'X-Forwarded-For' in request.headers:
