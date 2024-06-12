@@ -6,19 +6,22 @@ import os
 
 app = Flask(__name__)
 
+# Obtendo os IPs permitidos da variável de ambiente
 ALLOWED_IPS = os.getenv('ALLOWED_IPS', '').split(',')
 
 @app.before_request
 def limit_remote_addr():
+    # Render pode usar 'X-Forwarded-For' para o IP real do cliente
     if 'X-Forwarded-For' in request.headers:
-        user_ip = request.headers['X-Forwarded-For'].split(',')[0].strip()
+        user_ip = request.headers['X-Forwarded-For'].split(',')[0]
     else:
         user_ip = request.remote_addr
 
-    print(f"Request from IP: {user_ip}")
+    print(f"Cliente IP: {user_ip}")  # Adicionado para depuração
 
+    # Verifique se o IP está na lista de IPs permitidos
     if user_ip not in ALLOWED_IPS:
-        abort(403)
+        abort(403)  # Se o IP não estiver na lista, proíbe o acesso
 
 # Configure o Google Sheets
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
