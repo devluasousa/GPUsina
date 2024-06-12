@@ -12,7 +12,7 @@ ALLOWED_IPS = ['192.168.2.137', '127.0.0.1', '152.249.143.223']
 def limit_remote_addr():
     # Heroku armazena o endereço IP real do cliente no cabeçalho 'X-Forwarded-For'
     if 'X-Forwarded-For' in request.headers:
-        user_ip = request.headers['X-Forwarded-For']
+        user_ip = request.headers['X-Forwarded-For'].split(',')[0].strip()
     else:
         user_ip = request.remote_addr
 
