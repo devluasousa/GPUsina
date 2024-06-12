@@ -5,21 +5,19 @@ from google.oauth2.service_account import Credentials
 
 app = Flask(__name__)
 
-# Lista de IPs permitidos (substitua com os IPs reais que deseja permitir)
-ALLOWED_IPS = ['192.168.2.137', '127.0.0.1', '152.249.143.223']
+ALLOWED_IPS = os.getenv('ALLOWED_IPS', '').split(',')
 
 @app.before_request
 def limit_remote_addr():
-    # Heroku armazena o endereço IP real do cliente no cabeçalho 'X-Forwarded-For'
     if 'X-Forwarded-For' in request.headers:
-        # Obtém o primeiro IP da lista de IPs no cabeçalho 'X-Forwarded-For'
         user_ip = request.headers['X-Forwarded-For'].split(',')[0].strip()
     else:
         user_ip = request.remote_addr
 
-    # Verifique se o IP está na lista de IPs permitidos
+    print(f"Request from IP: {user_ip}")
+
     if user_ip not in ALLOWED_IPS:
-        abort(403)  # Se o IP não estiver na lista, proíbe o acesso
+        abort(403)
 
 # Configure o Google Sheets
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
