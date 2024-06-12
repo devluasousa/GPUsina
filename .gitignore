@@ -1,2 +1,19 @@
+# Ambiente virtual
 venv/
+
+# Arquivos Python compilados
+*.pyc
 __pycache__/
+
+# Arquivos de cache
+instance/
+.webassets-cache
+
+# Variáveis de ambiente
+.env
+
+# Arquivos específicos do sistema operacional
+.DS_Store
+
+# Credenciais sensíveis
+gestaopontousina-a32a6ea09560.json
