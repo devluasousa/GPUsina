@@ -52,7 +52,7 @@ def home():
         ]
         body = {
             'values': values
-        ]
+        }
         result = service.spreadsheets().values().append(
             spreadsheetId=SPREADSHEET_ID, range=range_,
             valueInputOption='USER_ENTERED', body=body).execute()
