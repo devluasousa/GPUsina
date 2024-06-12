@@ -1,35 +1,42 @@
 from flask import Flask, render_template, request, redirect, url_for, abort
 import datetime
+import os
 from googleapiclient.discovery import build
 from google.oauth2.service_account import Credentials
-import os
+
 
 app = Flask(__name__)
 
-# Lista de IPs permitidos
+# Obtém os IPs permitidos das variáveis de ambiente
 ALLOWED_IPS = os.getenv('ALLOWED_IPS', '').split(',')
+print(f"Allowed IPs: {ALLOWED_IPS}")
 
 @app.before_request
 def limit_remote_addr():
-    # Heroku armazena o endereço IP real do cliente no cabeçalho 'X-Forwarded-For'
-    user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-    
-    # Logging IPs para depuração
-    print(f"Cliente IP: {user_ip}")
-    print(f"Allowed IPs: {ALLOWED_IPS}")
+    # Render armazena o endereço IP real do cliente no cabeçalho 'X-Forwarded-For'
+    if 'X-Forwarded-For' in request.headers:
+        user_ip = request.headers['X-Forwarded-For'].split(',')[0].strip()
+    else:
+        user_ip = request.remote_addr
 
-    # Verifique se o IP está na lista de IPs permitidos
+    print(f"Cliente IP: {user_ip}")
+
+
+    # Verifica se o IP está na lista de IPs permitidos
     if user_ip not in ALLOWED_IPS:
         print(f"Acesso negado para IP: {user_ip}")
-        abort(403)
+        abort(403)  # Se o IP não estiver na lista, proíbe o acesso
+    else:
+        print(f"Acesso permitido para IP: {user_ip}")
 
-# Configure o Google Sheets
+# Configura o Google Sheets
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 SERVICE_ACCOUNT_FILE = 'gestaopontousina-a32a6ea09560.json'
 
 credentials = Credentials.from_service_account_file(
     SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 service = build('sheets', 'v4', credentials=credentials)
+# ID da sua planilha
 SPREADSHEET_ID = '1144zWwPY4atubZ--ZtIabpMeqeIj_0uMOoVXCfPTyTQ'
 
 @app.route('/', methods=['GET', 'POST'])
