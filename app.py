@@ -1,14 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for, abort
 import datetime
 import os
+import ipaddress
 from googleapiclient.discovery import build
 from google.oauth2.service_account import Credentials
 
 app = Flask(__name__)
 
-# Obtém os IPs permitidos das variáveis de ambiente
-ALLOWED_IPS = os.getenv('ALLOWED_IPS', '').split(',')
-print(f"Allowed IPs: {ALLOWED_IPS}")
+# Obtém as redes permitidas das variáveis de ambiente
+allowed_networks = os.getenv('ALLOWED_NETWORKS', '')
+ALLOWED_NETWORKS = [ipaddress.ip_network(network.strip()) for network in allowed_networks.split(',')]
+print(f"Allowed Networks: {ALLOWED_NETWORKS}")
 
 @app.before_request
 def limit_remote_addr():
@@ -17,9 +19,10 @@ def limit_remote_addr():
     else:
         user_ip = request.remote_addr
 
+    user_ip_address = ipaddress.ip_address(user_ip)
     print(f"Cliente IP: {user_ip}")
 
-    if user_ip not in ALLOWED_IPS:
+    if not any(user_ip_address in network for network in ALLOWED_NETWORKS):
         print(f"Acesso negado para IP: {user_ip}")
         abort(403)
     else:
