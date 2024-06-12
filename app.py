@@ -9,6 +9,8 @@ app = Flask(__name__)
 
 # Obtém as redes permitidas das variáveis de ambiente
 allowed_networks = os.getenv('ALLOWED_NETWORKS', '')
+if not allowed_networks:
+    raise ValueError("ALLOWED_NETWORKS variável de ambiente não configurada corretamente")
 ALLOWED_NETWORKS = [ipaddress.ip_network(network.strip()) for network in allowed_networks.split(',')]
 print(f"Allowed Networks: {ALLOWED_NETWORKS}")
 
@@ -50,7 +52,7 @@ def home():
         ]
         body = {
             'values': values
-        }
+        ]
         result = service.spreadsheets().values().append(
             spreadsheetId=SPREADSHEET_ID, range=range_,
             valueInputOption='USER_ENTERED', body=body).execute()
