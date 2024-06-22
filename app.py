@@ -4,19 +4,19 @@ import os
 from googleapiclient.discovery import build
 from google.oauth2.service_account import Credentials
 import secrets
-import ssl
-import httplib2
+import json
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)  # Chave secreta para a sessão
 
-# Configura o Google Sheets
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-SERVICE_ACCOUNT_FILE = 'gestaopontousina-a32a6ea09560.json'
+# Carregar credenciais do Google a partir da variável de ambiente
+def get_google_credentials():
+    credentials_info = json.loads(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'))
+    credentials = Credentials.from_service_account_info(credentials_info)
+    return credentials
 
 def build_service():
-    credentials = Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+    credentials = get_google_credentials()
     return build('sheets', 'v4', credentials=credentials)
 
 service = build_service()

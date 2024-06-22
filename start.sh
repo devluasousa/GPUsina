@@ -1,1 +1,2 @@
-gunicorn -w 4 -b 0.0.0.0:5000 app:app
+#!/bin/sh
+gunicorn app:app --bind 0.0.0.0:$PORT
