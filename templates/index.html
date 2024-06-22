@@ -101,13 +101,20 @@
         setInterval(updateTime, 1000);  // Atualiza a hora e a data a cada segundo
         updateTime();  // Ativa a função imediatamente ao carregar a página    
 
-        function startQrCodeScanner() {
+        async function startQrCodeScanner() {
             $('#qr-reader').show();
+
+            // Request camera permissions
+            try {
+                await navigator.mediaDevices.getUserMedia({ video: true });
+            } catch (err) {
+                console.error("Camera permission denied:", err);
+                return;
+            }
 
             const qrCodeSuccessCallback = (decodedText, decodedResult) => {
                 console.log(`Scan result: ${decodedText}`, decodedResult);
                 document.getElementById('qr_code_value').value = decodedText;
-                html5QrCodeScanner.clear();
                 document.getElementById('registro-form').submit();
             };
 
@@ -115,11 +122,30 @@
                 // parse error, ignore it.
             };
 
-            const config = { fps: 10, qrbox: 250 };
+            const config = { 
+                fps: 10, 
+                qrbox: 250,
+                disableFlip: true,
+                supportedScanTypes: [ Html5QrcodeScanType.SCAN_TYPE_CAMERA ]
+            };
 
-            const html5QrCodeScanner = new Html5QrcodeScanner(
-                "qr-reader", config, /* verbose= */ false);
-            html5QrCodeScanner.render(qrCodeSuccessCallback, qrCodeErrorCallback);
+            Html5Qrcode.getCameras().then(cameras => {
+                if (cameras && cameras.length) {
+                    // Select the back camera if available
+                    let backCamera = cameras.find(camera => camera.label.toLowerCase().includes('back'));
+                    let cameraId = backCamera ? backCamera.id : cameras[0].id;
+
+                    const html5QrCode = new Html5Qrcode("qr-reader");
+                    html5QrCode.start(
+                        { deviceId: { exact: cameraId } }, // Camera ID
+                        config,
+                        qrCodeSuccessCallback,
+                        qrCodeErrorCallback
+                    );
+                }
+            }).catch(err => {
+                console.error(err);
+            });
         }
     </script>
 </body>
