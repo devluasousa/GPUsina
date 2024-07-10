@@ -5,6 +5,7 @@ from googleapiclient.discovery import build
 from google.oauth2.service_account import Credentials
 import secrets
 import json
+import pytz
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)  # Chave secreta para a sessão
@@ -26,6 +27,9 @@ SPREADSHEET_ID = '1144zWwPY4atubZ--ZtIabpMeqeIj_0uMOoVXCfPTyTQ'
 # Código de confirmação (deve ser gerado e impresso no QR Code)
 CONFIRMATION_CODE = "us1n42k240622"
 
+# Define o fuso horário desejado
+LOCAL_TIMEZONE = pytz.timezone('America/Sao_Paulo')  # Altere para o fuso horário correto
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
@@ -35,10 +39,15 @@ def home():
 
         nome = request.form.get('nome')
         action = request.form.get('action')
-        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # Converte a hora atual para o fuso horário desejado
+        now_utc = datetime.datetime.now(pytz.utc)
+        now_local = now_utc.astimezone(LOCAL_TIMEZONE)
+        now_str = now_local.strftime("%Y-%m-%d %H:%M:%S")
+
         range_ = 'Registros!A2:C'
         values = [
-            [now, nome, action]
+            [now_str, nome, action]
         ]
         body = {
             'values': values
@@ -56,7 +65,7 @@ def home():
                 spreadsheetId=SPREADSHEET_ID, range='Cadastro!A2:A').execute()
             nomes = result.get('values', [])
             nomes = [nome[0] for nome in nomes if nome]
-            return render_template('index.html', nomes=nomes, current_time=datetime.datetime.now())
+            return render_template('index.html', nomes=nomes, current_time=datetime.datetime.now(LOCAL_TIMEZONE))
         except Exception as e:
             return render_template('error.html', message="Erro ao carregar nomes: " + str(e))
 
